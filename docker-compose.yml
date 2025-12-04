@@ -32,6 +32,7 @@ services:
       - db
     volumes:
       - ./src:/app/src
+      - /app/node_modules
     networks:
         - gitscope-net
     healthcheck:
@@ -43,6 +44,8 @@ services:
   pgadmin:
     image: dpage/pgadmin4
     restart: always
+    volumes:
+    - pgadmin_data:/var/lib/pgadmin
     container_name: gitscope-pgadmin
     environment:
       - PGADMIN_DEFAULT_EMAIL=${PGADMIN_EMAIL}
@@ -72,8 +75,7 @@ networks:
   gitscope-net:
     driver: bridge
 
-
-
-
+volumes:
+  pgadmin_data:
       
         
