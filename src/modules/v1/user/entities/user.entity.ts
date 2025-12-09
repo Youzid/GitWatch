@@ -1,16 +1,56 @@
-import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn } from "typeorm";
+import {
+    Entity,
+    PrimaryGeneratedColumn,
+    Column,
+    CreateDateColumn,
+    UpdateDateColumn,
+} from 'typeorm';
+
+export enum UserRole {
+    ADMIN = 'ADMIN',
+    MEMBER = 'MEMBER',
+    GUEST = 'GUEST',
+}
 
 @Entity('users')
 export default class UserTypeOrmEntity {
     @PrimaryGeneratedColumn()
-    id: number
+    id: number;
 
     @Column()
-    name:string
+    firstName: string;
+
+    @Column()
+    lastName: string;
+
+    @Column({ unique: true })
+    userName: string;
+
+    @Column({ unique: true })
+    email: string;
+
+    @Column()
+    password: string;
+
+    @Column({ nullable: true })
+    phone: string;
+
+    @Column({ nullable: true })
+    avatar: string;
+
+    @Column({
+        type: 'enum',
+        enum: UserRole,
+        default: UserRole.GUEST,
+    })
+    role: UserRole;
+
+    @Column({ default: false })
+    isActivated: boolean;
 
     @CreateDateColumn()
-    creation_date:string
+    createdAt: Date;
 
-    @Column()
-    email:string
+    @UpdateDateColumn()
+    updatedAt: Date;
 }

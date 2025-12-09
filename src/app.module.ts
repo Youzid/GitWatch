@@ -12,7 +12,7 @@ import { DatabaseModule } from './infra/database/database.module';
         }),
         UserModule,
         DatabaseModule,
-        LoggerModule
+        LoggerModule,
     ],
     controllers: [AppController],
     providers: [],
