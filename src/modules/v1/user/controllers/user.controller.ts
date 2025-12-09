@@ -1,11 +1,13 @@
 import { Body, Controller, Delete, Get, HttpException, HttpStatus, Param, ParseIntPipe, Post, Put } from "@nestjs/common";
 import { UserService } from "../services/user.service";
 import { CreateUserRequestModel, UpdateUserRequestModel } from "../dto/requests";
+import { LoggerService } from "../../../../infra/logger/logger.service";
 
 @Controller('user')
 export class UserController {
     constructor(
-        private readonly userService: UserService
+        private readonly userService: UserService,
+        private readonly logger : LoggerService
     ){}
 
     @Get()
