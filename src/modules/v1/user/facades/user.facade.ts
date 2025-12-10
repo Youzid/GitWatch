@@ -9,7 +9,7 @@ export class UserFacade {
         private readonly logger: LoggerService,
     ) {}
 
-    async findUserById(id:number) {
+    async getUserById(id:number) {
         // this.logger.log('Find User by ID: ' + id)
         return this.userService.getUserById(id)
     }

@@ -1,10 +1,71 @@
-import { Expose } from "class-transformer"
+import { Expose } from 'class-transformer';
+import {
+    IsBoolean,
+    IsEmail,
+    IsEnum,
+    IsInt,
+    IsOptional,
+    IsString,
+} from 'class-validator';
+import UserTypeOrmEntity, { UserRole } from '../../entities/user.entity';
 
-export class UpdateUserRequestModel {
+export class UpdateUserRequest
+    implements Partial<
+        Pick<
+            UserTypeOrmEntity,
+            | 'id'
+            | 'firstName'
+            | 'lastName'
+            | 'userName'
+            | 'email'
+            | 'phone'
+            | 'avatar'
+            | 'role'
+            | 'isActivated'
+        >
+    >
+{
     @Expose()
-    public id: number
+    @IsInt()
+    id: number;
+
     @Expose()
-    public name: string
+    @IsOptional()
+    @IsString()
+    firstName?: string;
+
     @Expose()
-    public email: string
+    @IsOptional()
+    @IsString()
+    lastName?: string;
+
+    @Expose()
+    @IsOptional()
+    @IsString()
+    userName?: string;
+
+    @Expose()
+    @IsOptional()
+    @IsEmail()
+    email?: string;
+
+    @Expose()
+    @IsOptional()
+    @IsString()
+    phone?: string;
+
+    @Expose()
+    @IsOptional()
+    @IsString()
+    avatar?: string;
+
+    @Expose()
+    @IsOptional()
+    @IsEnum(UserRole)
+    role?: UserRole;
+
+    @Expose()
+    @IsOptional()
+    @IsBoolean()
+    isActivated?: boolean;
 }
