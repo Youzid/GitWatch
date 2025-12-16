@@ -28,10 +28,12 @@
     "migrate:init": "cd src/infra/database && kysely migrate:init",
     "migrate:build": "cd src/infra/database && kysely migrate:build",
     "migrate:up:step": "cd src/infra/database && kysely migrate:up --step",
-    "migrate:down:step": "cd src/infra/database && kysely migrate:down --step"
+    "migrate:down:step": "cd src/infra/database && kysely migrate:down --step",
+    "seed": "kysely seed run",
+    "seed:all": "kysely seed run --all",
+    "db:codegen": "kysely-codegen --dialect postgres --out-file src/infra/database/database.types.ts --exclude-pattern migrations --exclude-pattern audit_  --exclude-pattern flyway_"
   },
   "dependencies": {
-    "@faker-js/faker": "^10.1.0",
     "@mikro-orm/core": "^6.6.1",
     "@mikro-orm/nestjs": "^6.1.1",
     "@nestjs/common": "^11.1.9",
@@ -55,6 +57,7 @@
   "devDependencies": {
     "@eslint/eslintrc": "^3.2.0",
     "@eslint/js": "^9.18.0",
+    "@faker-js/faker": "^10.1.0",
     "@nestjs/cli": "^11.0.0",
     "@nestjs/schematics": "^11.0.0",
     "@nestjs/testing": "^11.0.1",
@@ -67,6 +70,7 @@
     "eslint-plugin-prettier": "^5.2.2",
     "globals": "^16.0.0",
     "jest": "^30.0.0",
+    "kysely-codegen": "^0.19.0",
     "kysely-ctl": "^0.19.0",
     "kysely-migration-cli": "^0.4.2",
     "prettier": "^3.7.4",

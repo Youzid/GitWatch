@@ -3,6 +3,7 @@
 /node_modules
 /pgdata
 /build
+# /src/infra/database/database.types.ts
 
 # Logs
 logs

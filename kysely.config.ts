@@ -15,6 +15,9 @@ export default defineConfig({
       password: process.env.DB_PASSWORD,
     }),
   }),
+    seeds: {
+        seedFolder: 'src/infra/database/seeds',
+    },
   migrations: {
     migrationFolder: 'src/infra/database/migrations',
   },

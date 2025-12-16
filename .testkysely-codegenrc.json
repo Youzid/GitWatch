@@ -1,0 +1,22 @@
+{
+  "camelCase": false,
+  "customImports": {},
+  "dateParser": "timestamp",
+  "defaultSchemas": [],
+  "dialect": "postgres",
+  "domains": true,
+  "excludePattern": "(migrations|audit_.*|flyway_.*)",
+  "includePattern": null,
+  "logLevel": "warn",
+  "numericParser": "string",
+  "outFile": "./src/infra/database/types",
+  "overrides": {},
+  "partitions": false,
+  "print": false,
+  "runtimeEnums": false,
+  "singularize": false,
+  "typeMapping": {},
+  "typeOnlyImports": true,
+  "url": "postgresql://postgres:123@localhost:5432/gitscope",
+  "verify": false
+}

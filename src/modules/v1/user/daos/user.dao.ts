@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { Kysely } from 'kysely';
-import type { DB } from '../../../../infra/database/interface/db';
+import { DB } from '../../../../infra/database/database.types';
 
 @Injectable()
 export class UserDao {

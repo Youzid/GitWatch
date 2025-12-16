@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { Kysely, PostgresDialect } from 'kysely';
 import { Pool } from 'pg';
-import { DB } from './interface/db';
+import { DB } from './database.types';
 
 
 
