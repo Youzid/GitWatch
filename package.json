@@ -29,9 +29,21 @@
     "migrate:build": "cd src/infra/database && kysely migrate:build",
     "migrate:up:step": "cd src/infra/database && kysely migrate:up --step",
     "migrate:down:step": "cd src/infra/database && kysely migrate:down --step",
+    
+    "db:codegen": "kysely-codegen --dialect postgres --out-file src/infra/database/database.types.ts --exclude-pattern migrations --exclude-pattern audit_  --exclude-pattern flyway_",
+
     "seed": "kysely seed run",
     "seed:all": "kysely seed run --all",
-    "db:codegen": "kysely-codegen --dialect postgres --out-file src/infra/database/database.types.ts --exclude-pattern migrations --exclude-pattern audit_  --exclude-pattern flyway_"
+
+
+    "gen": "bash src/common/generators/generate.sh all",
+    "gen:controller": "bash src/common/generators/generate.sh controller",
+    "gen:service": "bash src/common/generators/generate.sh service",
+    "gen:facade": "bash src/common/generators/generate.sh facade",
+    "gen:repository": "bash src/common/generators/generate.sh repository",
+    "gen:dtos": "bash src/common/generators/generate.sh dtos",
+    "gen:events": "bash src/common/generators/generate.sh events",
+    "gen:module": "bash src/common/generators/generate.sh module"
   },
   "dependencies": {
     "@mikro-orm/core": "^6.6.1",
