@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { Kysely, PostgresDialect } from 'kysely';
+import { Kysely, PostgresDialect ,LogEvent} from 'kysely';
 import { Pool } from 'pg';
 import { DB } from './database.types';
 
@@ -17,7 +17,25 @@ const databaseProvider = {
         password: process.env.DB_PASSWORD,
       }),
     }),
-    
+     log(event: LogEvent): void {
+      if (event.level === 'query') {
+        console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+        console.log('🔍 KYSELY QUERY');
+        console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+        console.log('📝 SQL:', event.query.sql);
+        console.log('📊 Parameters:', event.query.parameters);
+        console.log('⏱️  Duration:', event.queryDurationMillis.toFixed(2), 'ms');
+        console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n');
+      }
+      
+      if (event.level === 'error') {
+        console.error('❌ KYSELY ERROR');
+        console.error('SQL:', event.query.sql);
+        console.error('Parameters:', event.query.parameters);
+        console.error('Error:', event.error);
+        console.error('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n');
+      }
+    },
   }),
 };
 

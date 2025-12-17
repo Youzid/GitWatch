@@ -1,6 +1,8 @@
 services:
   db:
-    image: postgres
+    build:
+      context: .
+      dockerfile: Dockerfile.postgres
     restart: always
     env_file:
       - .env.production
@@ -9,6 +11,16 @@ services:
       - POSTGRES_PASSWORD=${DB_PASSWORD}
       - POSTGRES_DB=${DB_DATABASE}
     container_name: gitscope-postgres
+    command:
+      - "postgres"
+      - "-c"
+      - "log_statement=all"
+      - "-c"
+      - "log_min_duration_statement=0"
+      - "-c"
+      - "logging_collector=on"
+      - "-c"
+      - "log_line_prefix=%t [%p]: user=%u,db=%d,app=%a "
     volumes:
       - ./pgdata:/var/lib/postgresql
     ports:
@@ -85,5 +97,3 @@ networks:
 
 volumes:
   pgadmin_data:
-      
-        
