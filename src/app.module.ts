@@ -4,14 +4,15 @@ import { AppController } from './app.controller';
 import { UserModule } from './modules/v1/user/user.module';
 import { LoggerModule } from './infra/logger/logger.module';
 import { DatabaseModule } from './infra/database/database.module';
+import { AuthModule } from './modules/v1/auth/auth.module';
 
 @Module({
     imports: [
         ConfigModule.forRoot({
             isGlobal: true
         }),
-        
         DatabaseModule,
+        AuthModule,
         UserModule,
         LoggerModule,
     ],

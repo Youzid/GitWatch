@@ -1,27 +1,35 @@
-import { Injectable } from '@nestjs/common';
-import { UserDao } from '../daos/user.dao';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { UserRepository } from '../repositories/user.repository';
 
 @Injectable()
 export class UserService {
-  constructor(private readonly userDao: UserDao) {}
+    constructor(private readonly userRepository: UserRepository) { }
 
-  getAllUsers() {
-    return this.userDao.findAll();
-  }
+    getAll() {
+        return this.userRepository.findAll();
+    }
+    async findOneByEmail(email: string): Promise<any> {
+        const user = await this.userRepository.findOneByEmail(email);
+        console.log(user)
+        if (!user) {
+            throw new UnauthorizedException('user not found');
+        }
+        return user;
+    }
 
-//   getUserById(id: number) {
-//     return this.userDao.findById(id);
-//   }
+    //   getUserById(id: number) {
+    //     return this.userDao.findById(id);
+    //   }
 
-//   createUser(dto: CreateUserDto) {
-//     return this.userDao.create(dto);
-//   }
+    //   createUser(dto: CreateUserDto) {
+    //     return this.userDao.create(dto);
+    //   }
 
-//   updateUser(id: number, dto: UpdateUserDto) {
-//     return this.userDao.update(id, dto);
-//   }
+    //   updateUser(id: number, dto: UpdateUserDto) {
+    //     return this.userDao.update(id, dto);
+    //   }
 
-//   deleteUser(id: number) {
-//     return this.userDao.delete(id);
-//   }
+    //   deleteUser(id: number) {
+    //     return this.userDao.delete(id);
+    //   }
 }
