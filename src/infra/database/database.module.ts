@@ -21,13 +21,11 @@ const databaseProvider = {
       if (event.level === 'query') {
         console.log('SQL:', event.query.sql);
         console.log('Parameters:', event.query.parameters);
-        console.log('Duration:', event.queryDurationMillis.toFixed(2), 'ms');
       }
       
       if (event.level === 'error') {
         console.error('SQL:', event.query.sql);
         console.error('Parameters:', event.query.parameters);
-        console.error('Error:', event.error);
       }
     },
   }),

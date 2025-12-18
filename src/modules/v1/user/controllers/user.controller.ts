@@ -3,14 +3,12 @@ import {
   Get,
 } from '@nestjs/common';
 import { UserService } from '../services/user.service';
-import { Public } from '../../auth/decorators/public.decorator';
 
 
 
 @Controller('users')
 export class UserController {
   constructor(private readonly userService: UserService) {}
-  
   @Get()
   findAll() {
     return this.userService.getAll();

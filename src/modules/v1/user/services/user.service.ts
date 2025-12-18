@@ -1,5 +1,6 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { UserRepository } from '../repositories/user.repository';
+import { NotFoundError } from 'rxjs';
 
 @Injectable()
 export class UserService {
@@ -10,9 +11,8 @@ export class UserService {
     }
     async findOneByEmail(email: string): Promise<any> {
         const user = await this.userRepository.findOneByEmail(email);
-        console.log(user)
         if (!user) {
-            throw new UnauthorizedException('user not found');
+            throw new NotFoundError('user not found');
         }
         return user;
     }

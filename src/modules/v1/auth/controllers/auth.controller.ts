@@ -1,19 +1,24 @@
-import { Controller, Body, Post, HttpCode, HttpStatus, UsePipes, ValidationPipe } from '@nestjs/common';
-import { AuthFacade } from '../facades/auth.facade';
-import { SignInAuthDto } from '../dtos/sign-in.auth.dto';
-import { Public } from '../decorators/public.decorator';
+import { Controller, Post, HttpCode, HttpStatus, UseGuards, Request, Get } from '@nestjs/common';
+import { LocalAuthGuard } from '../guards/local-auth.guard';
+import { AuthService } from '../services/auth.service';
+import { JwtAuthGuard } from '../guards/jwt-auth.guard';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authFacade: AuthFacade) {}
+  constructor(private readonly authService: AuthService) {}
   
   @HttpCode(HttpStatus.OK)
-  @Public()
   @Post('login')
-  @UsePipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }))
-  singIn(@Body() singInAuthDto: SignInAuthDto): Promise<any> {
-    return this.authFacade.signIn(singInAuthDto);
+  @UseGuards(LocalAuthGuard)
+  login(@Request() req) {
+    console.log("req")
+    return this.authService.login(req.user);
   }
 
+    // @UseGuards(JwtAuthGuard)
+    @Get('profile')
+    getProfile(@Request() req) {
+        return req.user;
+  }
 
 }
