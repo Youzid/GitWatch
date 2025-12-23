@@ -42,6 +42,14 @@ export interface Commits {
   updated_at: Generated<Timestamp | null>;
 }
 
+export interface EmailVerificationTokens {
+  created_at: Generated<Timestamp>;
+  expires_at: Timestamp;
+  id: Generated<number>;
+  token_hash: string;
+  user_id: number;
+}
+
 export interface PullRequests {
   author_email: string | null;
   base_sha: string | null;
@@ -54,6 +62,17 @@ export interface PullRequests {
   status: PrStatus | null;
   title: string | null;
   updated_at: Generated<Timestamp | null>;
+}
+
+export interface RefreshTokens {
+  created_at: Generated<Timestamp>;
+  device_id: string | null;
+  expires_at: Timestamp;
+  id: Generated<number>;
+  ip_address: string | null;
+  revoked_at: Timestamp | null;
+  token_hash: string;
+  user_id: number;
 }
 
 export interface Repositories {
@@ -76,11 +95,11 @@ export interface RepoUser {
 }
 
 export interface Users {
-  access_token: string | null;
   avatar_url: string | null;
   created_at: Generated<Timestamp | null>;
   email: string;
   id: Generated<number>;
+  is_active: Generated<boolean>;
   password: string;
   username: string;
 }
@@ -88,7 +107,9 @@ export interface Users {
 export interface DB {
   commit_files: CommitFiles;
   commits: Commits;
+  email_verification_tokens: EmailVerificationTokens;
   pull_requests: PullRequests;
+  refresh_tokens: RefreshTokens;
   repo_user: RepoUser;
   repositories: Repositories;
   users: Users;

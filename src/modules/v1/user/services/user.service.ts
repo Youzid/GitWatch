@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { UserRepository } from '../repositories/user.repository';
-import { NotFoundError } from 'rxjs';
+import { CreateUserDto } from '../dtos/create-user.dto';
 
 @Injectable()
 export class UserService {
@@ -11,25 +11,11 @@ export class UserService {
     }
     async findOneByEmail(email: string): Promise<any> {
         const user = await this.userRepository.findOneByEmail(email);
-        if (!user) {
-            throw new NotFoundError('user not found');
-        }
         return user;
     }
 
-    //   getUserById(id: number) {
-    //     return this.userDao.findById(id);
-    //   }
-
-    //   createUser(dto: CreateUserDto) {
-    //     return this.userDao.create(dto);
-    //   }
-
-    //   updateUser(id: number, dto: UpdateUserDto) {
-    //     return this.userDao.update(id, dto);
-    //   }
-
-    //   deleteUser(id: number) {
-    //     return this.userDao.delete(id);
-    //   }
+    async create(createUserDto: CreateUserDto) {
+        const user = await this.userRepository.create(createUserDto);
+        return user;
+    }
 }

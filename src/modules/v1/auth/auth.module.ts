@@ -10,15 +10,17 @@ import { LocalStrategy } from './strategies/local.strategy';
 import { JwtModule } from '@nestjs/jwt';
 import { jwtConstants } from './strategies/constants';
 import { JwtStrategy } from './strategies/jwt.strategy';
+import { MailModule } from '../mail/mail.module';
 
 @Module({
     imports: [
         DatabaseModule,
         UserModule,
         PassportModule,
+        MailModule,
         JwtModule.register({
             secret: jwtConstants.secret,
-            signOptions: { expiresIn: '60s' },
+            signOptions: { expiresIn: '60000s' },
         }),
     ],
     controllers: [AuthController],
