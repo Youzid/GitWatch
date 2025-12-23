@@ -8,9 +8,10 @@ import { DatabaseModule } from '../../../infra/database/database.module';
 import { PassportModule } from '@nestjs/passport';
 import { LocalStrategy } from './strategies/local.strategy';
 import { JwtModule } from '@nestjs/jwt';
-import { jwtConstants } from './strategies/constants';
-import { JwtStrategy } from './strategies/jwt.strategy';
 import { MailModule } from '../mail/mail.module';
+import { jwtConfig } from './strategies/constants';
+import { JwtAccessStrategy } from './strategies/jwt-acess.strategy';
+import { JwtRefreshStrategy } from './strategies/jwt-refresh.strategy';
 
 @Module({
     imports: [
@@ -19,12 +20,12 @@ import { MailModule } from '../mail/mail.module';
         PassportModule,
         MailModule,
         JwtModule.register({
-            secret: jwtConstants.secret,
-            signOptions: { expiresIn: '60000s' },
+            secret: jwtConfig.access.secret,
+            signOptions: { expiresIn: jwtConfig.access.expiresIn as any  },
         }),
     ],
     controllers: [AuthController],
-    providers: [ AuthService, AuthFacade, AuthRepository,LocalStrategy,JwtStrategy],
+    providers: [AuthService, AuthFacade, AuthRepository, LocalStrategy, JwtAccessStrategy, JwtRefreshStrategy],
     exports: [AuthFacade],
 })
 export class AuthModule { }

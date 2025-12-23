@@ -39,4 +39,13 @@ export class AuthRepository {
         });
 
     }
+    async saveRefreshToken({ user_id, refreshTokenHash, expires_at }) {
+        return await this.db.insertInto("refresh_tokens").values({
+            token_hash: refreshTokenHash,
+            user_id:user_id,
+            expires_at,
+            created_at: new Date()
+        }).execute()
+
+    }
 }

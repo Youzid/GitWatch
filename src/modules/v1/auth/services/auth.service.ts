@@ -28,21 +28,27 @@ export class AuthService {
         return result;
     }
 
-    login(user: any) {
-        const payload = { email: user.email, sub: user.userId };
+    async login(user: any) {
+        const payload = { email: user.email, sub: user.id };
+        const accessToken = this.jwtService.sign(payload, { expiresIn: '15m' });
+        const refreshToken = this.jwtService.sign(payload, { expiresIn: '7d' });
+        const hashedRefreshToken = await bcrypt.hash(refreshToken, 10);
+        const expiresAt = new Date();
+        expiresAt.setDate(expiresAt.getDate() + 7)
+
+        await this.authRepository.saveRefreshToken({
+            expires_at: expiresAt,
+            refreshTokenHash: hashedRefreshToken,
+            user_id: user.id
+        });
+
         return {
-            id: user.id,
-            email: user.email,
-            username: user.username,
-            access_token: this.jwtService.sign(payload, { expiresIn: '15m' }),
+            access_token: accessToken,
+            refresh_token: refreshToken,
         };
     }
 
 
-
-
-
-    
 
     async register(registerAuthDto: RegisterAuthDto) {
         // check if email exists
@@ -51,7 +57,6 @@ export class AuthService {
             throw new BadRequestException('Email already registered');// if user email exist , we should send reset password or email isntead of this message 
         }
 
-        //  hashing pswrd 
         const hashedPassword = await bcrypt.hash(registerAuthDto.password, 10)
 
         const user = await this.usersFacade.create({
@@ -64,7 +69,7 @@ export class AuthService {
         })
 
         if (!user) { throw new BadRequestException("faield to create a user") }
-        // generate verification token
+
         const verificationToken = randomUUID();
         const hashedToken = await bcrypt.hash(verificationToken, 10);
         const expiresAt = new Date();
@@ -75,8 +80,6 @@ export class AuthService {
             token_hash: hashedToken,
             user_id: user.id
         })
-
-
 
         await this.sendVerificationEmail(user.email, verificationToken);
 
@@ -95,7 +98,7 @@ export class AuthService {
     }
 
     async verifyEmail(token: string) {
-    const tokens = await this.authRepository.findValid();
+        const tokens = await this.authRepository.findValid();
 
         if (!tokens || tokens.length === 0) {
             throw new BadRequestException('Invalid or expired token');
@@ -116,6 +119,43 @@ export class AuthService {
             email: user.email,
         };
     }
+
+    // async refreshTokens(userId: number, refreshToken: string) {
+    //     const storedToken =
+    //         await this.authRepository.findValidRefreshTokenByUser(userId);
+
+    //     if (!storedToken) {
+    //         throw new UnauthorizedException('Refresh token not found');
+    //     }
+
+    //     const tokenMatches = await bcrypt.compare(
+    //         refreshToken,
+    //         storedToken.refresh_token_hash,
+    //     );
+
+    //     if (!tokenMatches) {
+    //         throw new UnauthorizedException('Invalid refresh token');
+    //     }
+
+    //     const payload = { sub: userId };
+
+    //     const newAccessToken = this.jwtService.sign(payload);
+
+    //     const newRefreshToken = this.jwtService.sign(payload)
+
+    //     const newHashedRefresh = await bcrypt.hash(newRefreshToken, 10);
+
+    //     await this.authRepository.updateRefreshToken(
+    //         storedToken.id,
+    //         newHashedRefresh,
+    //         new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+    //     );
+
+    //     return {
+    //         accessToken: newAccessToken,
+    //         refreshToken: newRefreshToken,
+    //     };
+    // }
 }
 
 
