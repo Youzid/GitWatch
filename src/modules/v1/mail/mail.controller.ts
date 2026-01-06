@@ -11,7 +11,7 @@ export class MailController {
   async sendMail(userEmail) {
     await this.mailService.sendEmail({
       to:userEmail,
-      subject: 'Welcome to the Gitscope',
+      subject: 'Welcome to the gitwatch',
       context: {
         name: 'Jhon Doe',
       },

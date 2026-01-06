@@ -10,7 +10,7 @@ services:
       - POSTGRES_USER=${DB_USERNAME}
       - POSTGRES_PASSWORD=${DB_PASSWORD}
       - POSTGRES_DB=${DB_DATABASE}
-    container_name: gitscope-postgres
+    container_name: gitwatch-postgres
     command:
       - "postgres"
       - "-c"
@@ -26,7 +26,7 @@ services:
     ports:
       - "${DB_PORT}:5432"
     networks:
-        - gitscope-net
+        - gitwatch-net
     healthcheck:
       test: ["CMD-SHELL","pg_isready -U postgres"]
       interval: 10s
@@ -37,7 +37,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: "gitscope-app"
+    container_name: "gitwatch-app"
     env_file:
       - .env.production
     environment:
@@ -50,7 +50,7 @@ services:
       - ./src:/app/src
       - /app/node_modules
     networks:
-        - gitscope-net
+        - gitwatch-net
     healthcheck:
       test: ["CMD","curl","-f" , "http://localhost:${PORT}/healthcheck"]
       interval: 10s
@@ -64,7 +64,7 @@ services:
       - .env.production
     volumes:
     - pgadmin_data:/var/lib/pgadmin
-    container_name: gitscope-pgadmin
+    container_name: gitwatch-pgadmin
     environment:
       - PGADMIN_DEFAULT_EMAIL=${PGADMIN_EMAIL}
       - PGADMIN_DEFAULT_PASSWORD=${PGADMIN_PASSWORD}
@@ -73,18 +73,18 @@ services:
     depends_on:
       - db
     networks:
-      - gitscope-net
+      - gitwatch-net
 
   redis:
     image: "redis:alpine"
-    container_name: gitscope-redis
+    container_name: gitwatch-redis
     env_file:
       - .env.production
     ports:
       - "${REDIS_PORT}:${REDIS_PORT}"
     restart: always
     networks:
-      - gitscope-net
+      - gitwatch-net
     healthcheck:
       test: ['CMD', 'redis-cli', 'ping']
       interval: 10s
@@ -92,7 +92,7 @@ services:
       retries: 3
 
 networks:
-  gitscope-net:
+  gitwatch-net:
     driver: bridge
 
 volumes:

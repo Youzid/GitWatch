@@ -17,6 +17,6 @@
   "singularize": false,
   "typeMapping": {},
   "typeOnlyImports": true,
-  "url": "postgresql://postgres:123@localhost:5432/gitscope",
+  "url": "postgresql://postgres:123@localhost:5432/gitwatch",
   "verify": false
 }
