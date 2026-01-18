@@ -157,7 +157,6 @@ export async function up(db: Kysely<any>): Promise<void> {
     .createIndex('idx_refresh_tokens_not_revoked')
     .on('refresh_tokens')
     .column('user_id')
-    .where('revoked_at', 'is', null)
     .execute()
 
   // Create indexes for email_verification_tokens

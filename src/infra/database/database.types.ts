@@ -11,6 +11,8 @@ export type Generated<T> = T extends ColumnType<infer S, infer I, infer U>
 
 export type PrStatus = "CLOSED" | "MERGED" | "OPEN";
 
+export type RepoProvider = "github" | "gitlab";
+
 export type Timestamp = ColumnType<Date, Date | string, Date | string>;
 
 export type UserRole = "COLLABORATOR" | "OWNER" | "VIEWER";
@@ -81,8 +83,9 @@ export interface Repositories {
   id: Generated<number>;
   is_active: Generated<boolean | null>;
   name: string;
-  owner_id: number | null;
-  provider_repo_id: string | null;
+  repo_owner_name: string;
+  repo_provider: RepoProvider;
+  repo_token_encrypted: string;
   updated_at: Generated<Timestamp | null>;
 }
 
