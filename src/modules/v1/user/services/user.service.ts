@@ -6,8 +6,8 @@ import { CreateUserDto } from '../dtos/create-user.dto';
 export class UserService {
     constructor(private readonly userRepository: UserRepository) { }
 
-    getAll() {
-        return this.userRepository.findAll();
+    async getAll() {
+        return await this.userRepository.findAll();
     }
     async findOneByEmail(email: string): Promise<any> {
         const user = await this.userRepository.findOneByEmail(email);

@@ -27,6 +27,7 @@ lerna-debug.log*
 .project
 .classpath
 .c9/
+.excalidraw
 *.launch
 .settings/
 *.sublime-workspace

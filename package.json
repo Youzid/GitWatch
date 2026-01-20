@@ -39,7 +39,8 @@
     "gen:repository": "bash src/common/generators/generate.sh repository",
     "gen:dtos": "bash src/common/generators/generate.sh dtos",
     "gen:events": "bash src/common/generators/generate.sh events",
-    "gen:module": "bash src/common/generators/generate.sh module"
+    "gen:module": "bash src/common/generators/generate.sh module",
+    "repl": "nest start --entryFile repl"
   },
   "dependencies": {
     "@mikro-orm/core": "^6.6.1",

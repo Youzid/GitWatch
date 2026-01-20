@@ -5,9 +5,10 @@ import { RepositoryFacade } from './facades/repository.facade';
 import { RepositoryRepository } from './repositories/repository.repository';
 import { DatabaseModule } from '../../../infra/database/database.module';
 import { EncryptionService } from '../../../infra/utils/encryption';
+import { GithubModule } from '../integrations/github/github-module';
 
 @Module({
-   imports: [DatabaseModule],
+   imports: [DatabaseModule,GithubModule],
   controllers: [RepositoryController],
   providers: [RepositoryService, RepositoryFacade, RepositoryRepository,EncryptionService],
   exports: [RepositoryFacade],
