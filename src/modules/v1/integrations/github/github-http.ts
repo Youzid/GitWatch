@@ -11,10 +11,10 @@ export class GithubHttp {
   async get<T>(url: string, token: string): Promise<AxiosResponse<T>> {
     const response$ = this.http.get<T>(url, {
       headers: {
-        Authorization: `Bearer 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`,
+        Authorization: `Bearer ${token}`,
         Accept: 'application/vnd.github+json',
-        // GitHub strongly recommends setting a User-Agent.
         'User-Agent': 'GitWatch',
+        'X-GitHub-Api-Version': '2022-11-28',
       },
       validateStatus: () => true,
     });
