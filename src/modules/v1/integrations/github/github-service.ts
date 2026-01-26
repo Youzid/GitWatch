@@ -1,6 +1,7 @@
 import { BadRequestException, Injectable, UnauthorizedException } from "@nestjs/common";
 import { GithubHttp } from "./github-http";
-import {  GithubRepositoryResponse } from "./github-responses";
+import {  GithubBranchResponse, GithubRepositoryResponse, GithubTreeResponse } from "./github-responses";
+import { response } from "express";
 @Injectable()
 // should implements IGitProvider
 export class GitHubService {
@@ -57,16 +58,29 @@ export class GitHubService {
     //     );
     // }
     // // get branch commit tree_sha
-    // async getBranchData(owner: string, repo: string, branch: string, token: string): Promise<GithubBranchResponse> {
-    //     return await this.githubHttp.get(
-    //         `${this.baseUrl}/repos/${owner}/${repo}/branches/${branch}`, token
-    //     );
-    // }
+    
+    async getRepoFilesList(owner: string, repo: string, branch: string, token: string): Promise<GithubTreeResponse> {
+        const tree_sha = (await this.getBranchData(owner, repo, branch, token))?.commit?.commit?.tree?.sha
+        if (!tree_sha) {
+            throw new BadRequestException('Failed to find treesha')
+        }
+        const treeData = await this.getTreeData(owner, repo, tree_sha, token,)
+        return treeData
+    }
+
+    async getBranchData(owner: string, repo: string, branch: string, token: string): Promise<GithubBranchResponse> {
+        const response = await this.githubHttp.get<GithubBranchResponse>(`${this.baseUrl}/repos/${owner}/${repo}/branches/${branch}`, token);
+        const data = response.data
+        return data
+    }
+
     // // get tree data
-    // async getTreeData(owner: string, repo: string, tree_sha: string, token: string): Promise<GithubTreeResponse> {
-    //     return await this.githubHttp.get(
-    //         `${this.baseUrl}/repos/${owner}/${repo}/git/trees/${tree_sha}?recursive=1`, token
-    //     );
-    // }
+    async getTreeData(owner: string, repo: string, tree_sha: string, token: string): Promise<GithubTreeResponse> {
+        const response = await this.githubHttp.get<GithubTreeResponse>(
+            `${this.baseUrl}/repos/${owner}/${repo}/git/trees/${tree_sha}?recursive=1`, token
+        );
+        const data = response.data
+        return data
+    } 
 
 }
