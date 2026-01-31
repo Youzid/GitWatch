@@ -91,6 +91,19 @@ services:
       timeout: 5s
       retries: 3
 
+  redis-commander:
+    image: rediscommander/redis-commander:latest
+    container_name: gitwatch-redis-commander
+    restart: always
+    environment:
+      - REDIS_HOSTS=local:gitwatch-redis:6379
+    ports:
+      - "8081:8081"
+    depends_on:
+      - redis
+    networks:
+      - gitwatch-net   
+
 networks:
   gitwatch-net:
     driver: bridge

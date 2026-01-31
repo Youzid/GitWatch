@@ -1,6 +1,6 @@
 // not defined well
 
-export class RawTreeDto {
+export class RawTreeDTO {
     sha: string;
     url: string;
     tree: {

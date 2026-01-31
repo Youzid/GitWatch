@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { GitHubService } from './github-service';
+import { GitHubService } from './services/github-service';
 import { GithubHttp } from './github-http';
 import { HttpModule } from '@nestjs/axios';
 

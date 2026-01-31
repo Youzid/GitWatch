@@ -1,5 +1,5 @@
 // not defined well
-export class RawCommitDto {
+export class RawCommitDTO {
   sha: string;
   message: string;
   author: {

@@ -7,7 +7,7 @@ import { Insertable } from 'kysely';
 import { EncryptionService } from '../../../../infra/utils/encryption';
 import { ResponseRepositoryDto } from '../dtos/response-repository.dto';
 import { plainToClass } from 'class-transformer';
-import { GitHubService } from '../../integrations/github/github-service';
+import { GitHubService } from '../../git-provider/services/github-service';
 
 @Injectable()
 export class RepositoryService {
@@ -22,7 +22,7 @@ export class RepositoryService {
         if (existingRepo) {
             throw new ConflictException(`Repository '${dto.name}' already exists`);
         }
-        await this.githubService.validatePatAndGetBranch(dto.repoOwnerName, dto.name, dto.patToken, dto.defaultBranch);
+        await this.githubService.validatePatAndGetBranch({owner: dto.repoOwnerName, repo_name: dto.name, token: dto.patToken, default_branch: dto.defaultBranch});
 
         const encryptedToken = this.encryptionService.encrypt(dto.patToken);
         const repository_data: Insertable<DB['repositories']> = 

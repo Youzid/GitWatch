@@ -1,5 +1,5 @@
 // not defined well
-export class RawRepositoryDto {
+export class RawRepositoryDTO {
   id: string;
   name: string;
   full_name: string;
