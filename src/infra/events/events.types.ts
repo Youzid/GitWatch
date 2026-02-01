@@ -1,10 +1,9 @@
 import { EVENTS } from "./events.constants";
 
 export interface RepositoryCreatedPayload {
-  repositoryId: number;
+    repositoryId: number;
 }
 
 export interface EventPayloadMap {
-  [EVENTS.REPOSITORY_CREATED]: RepositoryCreatedPayload;
-
+    [EVENTS.REPOSITORY_CREATED]: RepositoryCreatedPayload;
 }

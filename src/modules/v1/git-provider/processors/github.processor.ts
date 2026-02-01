@@ -3,11 +3,11 @@ import { Job } from 'bullmq';
 import { Injectable } from '@nestjs/common'
 import { QUEUE_NAMES } from '../../../../infra/queue/queue.names';
 import {
-    FetchRawTreeDataJobData,
+    IFetchRawTreeDataJob,
     FETCH_RAW_TREE_DATA_JOB_NAME
 } from '../jobs/fetch-raw-tree-data.job';
 import {
-    FetchRawCommitsDataJobData,
+    IFetchRawCommitsDataJob,
     FETCH_RAW_COMMITS_DATA_JOB_NAME
 } from '../jobs/fetch-raw-commits-data.job';
 import { GitHubService } from '../services/github-service';
@@ -29,22 +29,22 @@ export class GitHubProcessor extends WorkerHost {
         super();
     }
 
-    async process(job: Job<FetchRawTreeDataJobData | FetchRawCommitsDataJobData>) {
+    async process(job: Job<IFetchRawTreeDataJob | IFetchRawCommitsDataJob>) {
         console.log(`[GitHubProcessor] Processing job ${job.id} of type ${job.name}`);
 
         switch (job.name) {
             case FETCH_RAW_TREE_DATA_JOB_NAME:
-                return this.processFetchRawTreeData(job as Job<FetchRawTreeDataJobData>);
+                return this.processFetchRawTreeData(job as Job<IFetchRawTreeDataJob>);
 
             case FETCH_RAW_COMMITS_DATA_JOB_NAME:
-                return this.processFetchRawCommitsData(job as Job<FetchRawCommitsDataJobData>);
+                return this.processFetchRawCommitsData(job as Job<IFetchRawCommitsDataJob>);
 
             default:
                 throw new Error(`Unknown job name: ${job.name}`);
         }
     }
 
-    private async processFetchRawTreeData(job: Job<FetchRawTreeDataJobData>) {
+    private async processFetchRawTreeData(job: Job<IFetchRawTreeDataJob>) {
         const { repositoryId, owner, repo_name, default_branch, token } = job.data;
 
         try {
@@ -63,7 +63,7 @@ export class GitHubProcessor extends WorkerHost {
             throw error;
         }
     }
-    private async processFetchRawCommitsData(job: Job<FetchRawCommitsDataJobData>) {
+    private async processFetchRawCommitsData(job: Job<IFetchRawCommitsDataJob>) {
         const { repositoryId, owner, repo_name, token } = job.data;
 
         try {
@@ -86,4 +86,33 @@ export class GitHubProcessor extends WorkerHost {
             throw error;
         }
     }
+    
+    //  private async checkAndEnqueueNormalization(repositoryId: string, owner: string, repo_name: string) {
+    //     const treeCacheKey = `raw:tree:${repositoryId}`;
+    //     const commitsCacheKey = `raw:commits:${repositoryId}`;
+
+    //     const [treeDataExists, commitsDataExists] = await Promise.all([
+    //         this.redisService.exists(treeCacheKey),
+    //         this.redisService.exists(commitsCacheKey),
+    //     ]);
+
+    //     if (treeDataExists && commitsDataExists) {
+            
+    //         await this.normalizeQueue.add(
+    //             NORMALIZE_REPOSITORY_DATA,
+    //             {
+    //                 repositoryId,owner,repo_name,
+    //             },
+    //             {
+    //                 jobId: `normalize-${repositoryId}`,
+    //                 removeOnComplete: true,
+    //                 removeOnFail: false,
+    //             }
+    //         );
+
+    //         console.log(`[GitHubProcessor] Normalization job enqueued for repository ${repositoryId}`);
+    //     } else {
+    //         console.log(`[GitHubProcessor] Waiting for all data to be cached for repository ${repositoryId}. Tree: ${treeDataExists}, Commits: ${commitsDataExists}`);
+    //     }
+    // }
 }

@@ -10,6 +10,7 @@ import { plainToClass } from 'class-transformer';
 import { GitHubService } from '../../git-provider/services/github-service';
 import { GitHubQueueService } from '../../git-provider/services/github-queue.service';
 import { EventEmitter2 } from '@nestjs/event-emitter';
+import { EVENTS } from '../../../../infra/events/events.constants';
 
 @Injectable()
 export class RepositoryService {
@@ -47,7 +48,7 @@ export class RepositoryService {
             dto.defaultBranch,
             encryptedToken, // must be encrypted 
         );
-        this.eventEmitter.emit('repository.created', { repositoryId: savedData.id});
+        this.eventEmitter.emit(EVENTS.REPOSITORY_CREATED, { repositoryId: savedData.id});
         return plainToClass(ResponseRepositoryDto, savedData, { excludeExtraneousValues: true });
     }
 
