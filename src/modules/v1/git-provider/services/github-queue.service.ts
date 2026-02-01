@@ -14,8 +14,7 @@ import {
 @Injectable()
 export class GitHubQueueService {
     constructor(
-        @InjectQueue(QUEUE_NAMES.FETCH_PROVIDER_DATA_QUEUE)
-        private readonly fetchProviderDataQueue: Queue,
+        @InjectQueue(QUEUE_NAMES.FETCH_PROVIDER_DATA_QUEUE) private readonly fetchProviderDataQueue: Queue,
     ) { }
 
     async addFetchRawTreeDataJob(data: IFetchRawTreeDataJob) {
@@ -68,7 +67,7 @@ export class GitHubQueueService {
         return job;
     }
 
-    async addFetchAllRawDataJobs(repositoryId: number, owner: string, repo_name: string, default_branch: string, token: string,) {
+    async addFetchMainRawDataJobs({ repositoryId, owner, repo_name, default_branch, token, }: { repositoryId: number;owner: string; repo_name: string; default_branch: string;token: string;}) {
 
         const [treeJob, commitsJob] = await Promise.all([
             this.addFetchRawTreeDataJob({ repositoryId, owner, repo_name, default_branch, token, }),

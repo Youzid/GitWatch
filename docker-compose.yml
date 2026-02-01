@@ -83,6 +83,8 @@ services:
     ports:
       - "${REDIS_PORT}:${REDIS_PORT}"
     restart: always
+    volumes:
+      - redis_data:/data    
     networks:
       - gitwatch-net
     healthcheck:
@@ -99,10 +101,12 @@ services:
     restart: always
     depends_on:
       - redis
+    volumes:
+      - redisinsight_data:/data
     networks:
       - gitwatch-net
     environment:
-      - RI_HOSTS=gitwatch-redis:${REDIS_PORT}   # Preconnect to your Redis container
+      - RI_HOSTS=gitwatch-redis:${REDIS_PORT}
 
 networks:
   gitwatch-net:
@@ -110,3 +114,5 @@ networks:
 
 volumes:
   pgadmin_data:
+  redis_data:
+  redisinsight_data: 

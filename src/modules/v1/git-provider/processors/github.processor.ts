@@ -49,7 +49,7 @@ export class GitHubProcessor extends WorkerHost {
 
         try {
             console.log(`[GitHubProcessor] Fetching tree data for ${owner}/${repo_name} (repo ${repositoryId})`);
-
+            
             const treeData = await this.githubService.getTreeData({ owner, repo_name, default_branch, token, });
 
             const cacheKey = `raw:tree:${repositoryId}`;

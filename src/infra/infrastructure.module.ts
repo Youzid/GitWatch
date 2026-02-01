@@ -4,6 +4,7 @@ import { RedisModule } from './redis/redis.module';
 import { QueueModule } from './queue/queue.module';
 import { LoggerModule } from './logger/logger.module';
 import { EventsModule } from './events/events.module';
+import { EncryptionService } from './utils/encryption.service';
 
 @Global()
 @Module({
@@ -14,10 +15,11 @@ import { EventsModule } from './events/events.module';
         LoggerModule,
         EventsModule,
     ],
-    providers: [],
+    providers: [EncryptionService],
     exports: [
         RedisModule,
         EventsModule,
+        EncryptionService,
         QueueModule,
         DatabaseModule,
         LoggerModule,

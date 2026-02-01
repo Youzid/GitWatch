@@ -4,13 +4,12 @@ import { CreateRepositoryDto } from '../dtos/create-repository.dto';
 
 import { DB } from '../../../../infra/database/database.types';
 import { Insertable } from 'kysely';
-import { EncryptionService } from '../../../../infra/utils/encryption';
+import { EncryptionService } from '../../../../infra/utils/encryption.service';
 import { ResponseRepositoryDto } from '../dtos/response-repository.dto';
 import { plainToClass } from 'class-transformer';
 import { GitHubService } from '../../git-provider/services/github-service';
-import { GitHubQueueService } from '../../git-provider/services/github-queue.service';
-import { EventEmitter2 } from '@nestjs/event-emitter';
 import { EVENTS } from '../../../../infra/events/events.constants';
+import { EventsService } from '../../../../infra/events/events.service';
 
 @Injectable()
 export class RepositoryService {
@@ -18,8 +17,7 @@ export class RepositoryService {
         private readonly repositoryRepository: RepositoryRepository,
         private readonly encryptionService: EncryptionService,
         private readonly githubService: GitHubService,
-        private readonly eventEmitter: EventEmitter2,
-        private readonly githubQueueService: GitHubQueueService,
+        private readonly eventService: EventsService,
     ) { }
 
     async create(dto: CreateRepositoryDto, userId: number) {
@@ -27,9 +25,9 @@ export class RepositoryService {
         if (existingRepo) {
             throw new ConflictException(`Repository '${dto.name}' already exists`);
         }
-        await this.githubService.validatePatAndGetBranch({owner: dto.repoOwnerName, repo_name: dto.name, token: dto.patToken, default_branch: dto.defaultBranch});
-
         const encryptedToken = this.encryptionService.encrypt(dto.patToken);
+        await this.githubService.validatePatAndGetBranch({owner: dto.repoOwnerName, repo_name: dto.name, token: encryptedToken, default_branch: dto.defaultBranch});
+
         const repository_data: Insertable<DB['repositories']> = 
         {
             is_active: false,
@@ -41,14 +39,8 @@ export class RepositoryService {
         }
         const savedData = await this.repositoryRepository.create(repository_data, userId);
 
-        await this.githubQueueService.addFetchAllRawDataJobs(
-            savedData.id,
-            dto.repoOwnerName,
-            dto.name,
-            dto.defaultBranch,
-            encryptedToken, // must be encrypted 
-        );
-        this.eventEmitter.emit(EVENTS.REPOSITORY_CREATED, { repositoryId: savedData.id});
+        this.eventService.emit(EVENTS.REPOSITORY_CREATED, { repositoryId: savedData.id,owner: dto.repoOwnerName, repo_name: dto.name, default_branch: dto.defaultBranch, token: encryptedToken, });
+
         return plainToClass(ResponseRepositoryDto, savedData, { excludeExtraneousValues: true });
     }
 

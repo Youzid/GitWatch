@@ -1,17 +1,21 @@
-// github-http.ts
 import { HttpService } from '@nestjs/axios';
 import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { firstValueFrom } from 'rxjs';
 import { AxiosResponse } from 'axios';
+import { EncryptionService } from '../../../../infra/utils/encryption.service';
 
 @Injectable()
 export class GithubHttp {
-  constructor(private readonly http: HttpService) {}
+    constructor(
+        private readonly http: HttpService,
+        private readonly encryptionService: EncryptionService,
+    ) { }
 
   async get<T>(url: string, token: string): Promise<AxiosResponse<T>> {
+    const decryptedToken = this.encryptionService.decrypt(token);
     const response$ = this.http.get<T>(url, {
       headers: {
-        Authorization: `Bearer ${token}`,
+        Authorization: `Bearer ${decryptedToken}`,
         Accept: 'application/vnd.github+json',
         'User-Agent': 'GitWatch',
         'X-GitHub-Api-Version': '2022-11-28',
