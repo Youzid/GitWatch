@@ -8,6 +8,8 @@ import { EncryptionService } from '../../../../infra/utils/encryption';
 import { ResponseRepositoryDto } from '../dtos/response-repository.dto';
 import { plainToClass } from 'class-transformer';
 import { GitHubService } from '../../git-provider/services/github-service';
+import { GitHubQueueService } from '../../git-provider/services/github-queue.service';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 
 @Injectable()
 export class RepositoryService {
@@ -15,6 +17,8 @@ export class RepositoryService {
         private readonly repositoryRepository: RepositoryRepository,
         private readonly encryptionService: EncryptionService,
         private readonly githubService: GitHubService,
+        private readonly eventEmitter: EventEmitter2,
+        private readonly githubQueueService: GitHubQueueService,
     ) { }
 
     async create(dto: CreateRepositoryDto, userId: number) {
@@ -34,7 +38,16 @@ export class RepositoryService {
             default_branch: dto.defaultBranch,
             repo_token_encrypted: encryptedToken,
         }
-        const savedData = await this.repositoryRepository.create(repository_data, userId)
+        const savedData = await this.repositoryRepository.create(repository_data, userId);
+
+        await this.githubQueueService.addFetchAllRawDataJobs(
+            savedData.id,
+            dto.repoOwnerName,
+            dto.name,
+            dto.defaultBranch,
+            encryptedToken, // must be encrypted 
+        );
+        this.eventEmitter.emit('repository.created', { repositoryId: savedData.id});
         return plainToClass(ResponseRepositoryDto, savedData, { excludeExtraneousValues: true });
     }
 

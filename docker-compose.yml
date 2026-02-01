@@ -91,18 +91,18 @@ services:
       timeout: 5s
       retries: 3
 
-  redis-commander:
-    image: rediscommander/redis-commander:latest
-    container_name: gitwatch-redis-commander
-    restart: always
-    environment:
-      - REDIS_HOSTS=local:gitwatch-redis:6379
+  redisinsight:
+    image: redislabs/redisinsight:latest
+    container_name: gitwatch-redisinsight
     ports:
-      - "8081:8081"
+      - "8001:5540" 
+    restart: always
     depends_on:
       - redis
     networks:
-      - gitwatch-net   
+      - gitwatch-net
+    environment:
+      - RI_HOSTS=gitwatch-redis:${REDIS_PORT}   # Preconnect to your Redis container
 
 networks:
   gitwatch-net:

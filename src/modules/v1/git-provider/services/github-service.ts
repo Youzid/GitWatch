@@ -1,5 +1,5 @@
 import { BadRequestException, Injectable, UnauthorizedException } from "@nestjs/common";
-import { GithubHttp } from "../github-http";
+import { GithubHttp } from "../config/github-http";
 import {GithubBranchResponse, GithubRepositoryResponse, GithubTreeResponse } from "../dto/github-responses";
 import { RepoDTO } from "../dto/repo-dto";
 

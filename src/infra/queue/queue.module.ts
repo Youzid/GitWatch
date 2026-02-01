@@ -29,6 +29,7 @@ import { QUEUE_NAMES } from './queue.names';
         // Processors are registered in their respective modules
         BullModule.registerQueue(
             { name: QUEUE_NAMES.FETCH_PROVIDER_DATA_QUEUE },
+            { name: QUEUE_NAMES.NORMALIZE_PROVIDER_DATA_QUEUE },
         ),
     ],
     exports: [BullModule],

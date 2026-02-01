@@ -1,13 +1,18 @@
 import { Injectable } from '@nestjs/common';
 import { UserRepository } from '../repositories/user.repository';
 import { CreateUserDto } from '../dtos/create-user.dto';
+import { EventsService } from '../../../../infra/events/events.service';
 
 @Injectable()
 export class UserService {
-    constructor(private readonly userRepository: UserRepository) { }
+    constructor(
+        private readonly userRepository: UserRepository,
+        private readonly eventService: EventsService,
+    ) { }
 
     async getAll() {
-        return await this.userRepository.findAll();
+        this.eventService.emit("repository.created",{repositoryId:123});
+        return await this.userRepository.findAll();        
     }
     async findOneByEmail(email: string): Promise<any> {
         const user = await this.userRepository.findOneByEmail(email);
