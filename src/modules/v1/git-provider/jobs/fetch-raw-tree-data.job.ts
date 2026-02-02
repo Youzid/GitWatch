@@ -1,4 +1,4 @@
-export interface IFetchRawTreeDataJob {
+export interface IFetchRawTreeJob {
   repositoryId: number;
   owner: string;
   repo_name: string;
@@ -6,5 +6,5 @@ export interface IFetchRawTreeDataJob {
   token: string;
 }
 
-export const FETCH_RAW_TREE_DATA_JOB_NAME = 'fetch_raw_tree_data';
+export const FETCH_RAW_TREE_JOB= 'fetch_raw_tree_job';
 
