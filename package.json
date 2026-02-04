@@ -23,7 +23,7 @@
     "migrate:down": "cd src/infra/database && kysely migrate:down",
     "migrate:list": "cd src/infra/database && kysely migrate:list",
     "migrate:make": "cd src/infra/database && kysely migrate:make",
-    "migrate:redo": "cd src/infra/database && kysely migrate:redo",
+    "migrate:rollback": "cd src/infra/database && kysely migrate:rollback",
     "migrate:reset": "cd src/infra/database && kysely migrate:reset",
     "migrate:init": "cd src/infra/database && kysely migrate:init",
     "migrate:build": "cd src/infra/database && kysely migrate:build",
@@ -40,7 +40,7 @@
     "gen:dtos": "bash src/common/generators/generate.sh dtos",
     "gen:events": "bash src/common/generators/generate.sh events",
     "gen:module": "bash src/common/generators/generate.sh module",
-    "repl": "nest start --entryFile repl"
+    "repl": "nest start --watch --entryFile repl"
   },
   "dependencies": {
     "@mikro-orm/core": "^6.6.1",

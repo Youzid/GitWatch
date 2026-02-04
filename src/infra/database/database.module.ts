@@ -19,8 +19,10 @@ const databaseProvider = {
     }),
      log(event: LogEvent): void {
       if (event.level === 'query') {
+        console.log('------------------- event --------------');
         console.log('SQL:', event.query.sql);
         console.log('Parameters:', event.query.parameters);
+        console.log('Duration (ms):', event.queryDurationMillis);
       }
       
       if (event.level === 'error') {

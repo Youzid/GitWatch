@@ -1,12 +1,13 @@
 const PREFIX = 'dev';
 
 export const CACHE_KEYS = {
+    //  prefix should e aded based on environment
   raw: {
     tree: (repositoryId: number ) =>
-      `${PREFIX}:raw:tree:${repositoryId}`,
+      `raw:tree:${repositoryId}`,
 
     commits: (repositoryId: number ) =>
-      `${PREFIX}:raw:commits:${repositoryId}`,
+      `raw:commits:${repositoryId}`,
   },
 
 } as const;

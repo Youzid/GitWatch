@@ -76,4 +76,19 @@ export class RepositoryRepository {
       ])
       .executeTakeFirst();
   }
+
+
+async bulkInsertFiles(files: Insertable<DB['files']>[]) {
+  if (files.length === 0) return [];
+
+  return await this.db.transaction().execute(async (trx) => {
+    const insertedFiles = await trx
+      .insertInto('files')
+      .values(files)
+      .returningAll()
+      .execute();
+    return insertedFiles;
+  });
+}
+
 }

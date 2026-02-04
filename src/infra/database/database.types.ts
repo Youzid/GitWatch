@@ -5,6 +5,8 @@
 
 import type { ColumnType } from "kysely";
 
+export type FileTypes = "BLOB" | "TREE";
+
 export type Generated<T> = T extends ColumnType<infer S, infer I, infer U>
   ? ColumnType<S, I | undefined, U>
   : ColumnType<T, T | undefined, T>;
@@ -50,6 +52,19 @@ export interface EmailVerificationTokens {
   id: Generated<number>;
   token_hash: string;
   user_id: number;
+}
+
+export interface Files {
+  depth: Generated<number>;
+  id: Generated<number>;
+  name: string;
+  parent_path: string | null;
+  path: string;
+  repository_id: number;
+  sha: string;
+  size: number | null;
+  type: FileTypes;
+  url: string;
 }
 
 export interface PullRequests {
@@ -111,6 +126,7 @@ export interface DB {
   commit_files: CommitFiles;
   commits: Commits;
   email_verification_tokens: EmailVerificationTokens;
+  files: Files;
   pull_requests: PullRequests;
   refresh_tokens: RefreshTokens;
   repo_user: RepoUser;
