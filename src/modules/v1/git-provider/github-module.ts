@@ -7,6 +7,7 @@ import { RedisModule } from '../../../infra/redis/redis.module';
 import { GitHubProcessor } from './processors/github.processor';
 import { GitHubQueueService } from './services/github-queue.service';
 import {GitHubEventsListener } from './events/git-events-listener';
+import { GitService } from './services/git-service';
 
 @Module({
     imports: [
@@ -17,9 +18,10 @@ import {GitHubEventsListener } from './events/git-events-listener';
     providers: [
         GitHubService,
         GithubHttp,
+        GitService,
         GitHubEventsListener,
         GitHubProcessor,
-        GitHubQueueService, 
+        GitHubQueueService,
     ],
     exports: [
         GitHubService,
