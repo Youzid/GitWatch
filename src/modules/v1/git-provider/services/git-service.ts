@@ -79,10 +79,44 @@ export class GitService {
     async removeRepoStorageDir(repositoryId: string | number): Promise<void> {
         const repoStorageDir = path.join(this.STORAGE_BASE_PATH, repositoryId.toString());
         await fs.rm(repoStorageDir, { recursive: true, force: true }).catch(() => { });
-
     }
 
-    async getCommitsHistory(repositoryId: number): Promise<CommitDetails[]> {
+    async getTreeData({ repositoryId }: { repositoryId: number }): Promise<{ path: string; type: 'blob' | 'tree'; mode: string; sha: string; size: number }[]> {
+        const repoPath = path.join(this.STORAGE_BASE_PATH, repositoryId.toString());
+        const git = simpleGit(repoPath);
+
+        try {
+            const result = await git.raw(['ls-tree', '-r', '-t', '-l', 'HEAD']);
+            console.log(result);
+            const files: { path: string; type: 'blob' | 'tree'; mode: string; sha: string; size: number }[] = [];
+
+            const lines = result.split('\n').filter(line => line.trim());
+            for (const line of lines) {
+
+                const match = line.match(/^(\d+)\s+(\w+)\s+([a-f0-9]+)\s+(\d+|-)\t(.+)$/);
+
+                if (match) {
+                    const [, mode, type, sha, sizeStr, filePath] = match;
+
+                    const size = sizeStr === '-' ? 0 : parseInt(sizeStr, 10);
+
+                    files.push({
+                        path: filePath,
+                        type: type as 'blob' | 'tree',
+                        mode: mode,
+                        sha: sha,
+                        size: size,
+                    });
+                }
+            }
+            return files;
+        } catch (error: any) {
+            throw new Error(`Failed to get tree files: ${error.message}`);
+        }
+    }
+
+
+    async getCommitsData(repositoryId: number): Promise<CommitDetails[]> {
         const repoPath = path.join(this.STORAGE_BASE_PATH, repositoryId.toString());
         const git = simpleGit(repoPath);
         try {
@@ -107,7 +141,6 @@ export class GitService {
                     files_changed: fileChanges,
                 });
             }
-            console.log(commits[0]);
             return commits;
         } catch (error: any) {
             throw new Error(`Failed to get commit history: ${error.message}`);
