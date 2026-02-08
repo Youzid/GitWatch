@@ -28,45 +28,39 @@ interface CommitDetails {
 export class GitService {
     private readonly STORAGE_BASE_PATH = path.join(process.cwd(), 'storage', 'git-data'); // add constant  key or env
 
-    private git: SimpleGit;
 
-    constructor(
-        private readonly encryptionService: EncryptionService,
+    constructor() { }
 
-    ) { this.git = simpleGit() }
+    async cloneRepository(params: { repositoryId: number, owner: string; repo_name: string; authenticatedUrl: string; token?: string; }): Promise<string> {
 
-    async cloneRepository(params: { repositoryId: number, owner: string; repo_name: string; clone_url: string; token?: string; }): Promise<string> {
-        console.log(params)
-        // Destructure parameters
-        // check create store path,
-        // check if there store path already exists 
-        // create authenticated URL with token
-        // clone repository using simple-git
-        // return path to the cloned repository
-
-        const { repositoryId, owner, repo_name, clone_url, token } = params;
+        const { repositoryId, owner, repo_name, authenticatedUrl } = params;
 
         const repoStorageDir = path.join(this.STORAGE_BASE_PATH, repositoryId.toString());
 
         try {
             if (await this.repositoryExists(repoStorageDir)) {
-                throw new Error(`Repository already exists at ${repoStorageDir}. Use update method instead.`);
+                const error = new Error(`Repository already exists at ${repoStorageDir}. Use update method instead.`);
+                (error as any).statusCode = 409
+                throw error;
             }
 
             await fs.mkdir(repoStorageDir, { recursive: true });
 
             // const decryptedToken = this.encryptionService.decrypt(token);
-            const authenticatedUrl = `https://${token}@github.com/${owner}/${repo_name}.git`; //use clone_url
 
             const git = simpleGit();
-            await git.clone(authenticatedUrl, repoStorageDir, ['--bare']);
+            git.env('GIT_TERMINAL_PROMPT', '0');
+            await git.clone(authenticatedUrl, repoStorageDir, ['--bare',],)
 
-            await this.saveMetadata(repoStorageDir, { repositoryId,owner,repo_name,clone_url,clonedAt: new Date().toISOString(),lastUpdated: new Date().toISOString()});
+            await this.saveMetadata(repoStorageDir, { repositoryId, owner, repo_name, clonedAt: new Date().toISOString(), lastUpdated: new Date().toISOString() });
 
             console.log(`Repository cloned successfully to: ${repoStorageDir}`);
 
             return repoStorageDir;
         } catch (error: any) {
+            if (error.statusCode !== 409) {
+                await this.removeRepoStorageDir(repositoryId);
+            }
             throw new Error(`Failed to clone repository: ${error.message}`);
         }
     }
@@ -82,9 +76,17 @@ export class GitService {
     }
 
 
-    async getCommitsHistory(): Promise<CommitDetails[]> {
+    async removeRepoStorageDir(repositoryId: string | number): Promise<void> {
+        const repoStorageDir = path.join(this.STORAGE_BASE_PATH, repositoryId.toString());
+        await fs.rm(repoStorageDir, { recursive: true, force: true }).catch(() => { });
+
+    }
+
+    async getCommitsHistory(repositoryId: number): Promise<CommitDetails[]> {
+        const repoPath = path.join(this.STORAGE_BASE_PATH, repositoryId.toString());
+        const git = simpleGit(repoPath);
         try {
-            const log = await this.git.log({
+            const log = await git.log({
                 // maxCount:1500,  
                 format: { hash: '%H', author_email: '%ae', message: '%s', date: '%ai', parent_hashes: '%P', },
             });
@@ -92,7 +94,7 @@ export class GitService {
             const commits: CommitDetails[] = [];
 
             for (const commit of log.all) {
-                const fileChanges = await this.getFileChanges(commit.hash);
+                const fileChanges = await this.getFileChanges(commit.hash, git);
 
                 commits.push({
                     sha: commit.hash,
@@ -105,17 +107,17 @@ export class GitService {
                     files_changed: fileChanges,
                 });
             }
-
+            console.log(commits[0]);
             return commits;
         } catch (error: any) {
             throw new Error(`Failed to get commit history: ${error.message}`);
         }
     }
 
-    private async getFileChanges(commitSha: string): Promise<FileChange[]> {
+    private async getFileChanges(commitSha: string, git: SimpleGit): Promise<FileChange[]> {
         try {
             // Get detailed diff stats with rename detection
-            const diffSummary = await this.git.diffSummary([
+            const diffSummary = await git.diffSummary([
                 `${commitSha}^`,// parent hash
                 commitSha,// current commit hash
                 '--numstat',
@@ -156,15 +158,15 @@ export class GitService {
         } catch (error) {
             // @ts-expect-error asdasd
             if (error.message.includes('unknown revision')) {// handling exeption where commit has no parent (initial commit)
-                return await this.getInitialCommitFiles(commitSha);
+                return await this.getInitialCommitFiles(commitSha, git);
             }
             throw error;
         }
     }
 
-    private async getInitialCommitFiles(commitSha: string): Promise<FileChange[]> {
+    private async getInitialCommitFiles(commitSha: string, git: SimpleGit): Promise<FileChange[]> {
         try {
-            const diffSummary = await this.git.diffSummary([
+            const diffSummary = await git.diffSummary([
                 '--root',
                 commitSha,
                 '--numstat',
