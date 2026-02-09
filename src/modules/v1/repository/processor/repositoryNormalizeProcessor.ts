@@ -5,11 +5,10 @@ import { QUEUE_NAMES } from '../../../../infra/queue/queue.names';
 import { RedisService } from '../../../../infra/redis/redis.service';
 import { EventsService } from '../../../../infra/events/events.service';
 import { CACHE_KEYS } from '../../../../infra/redis/redis-keys.constants.js';
-import { EVENTS } from '../../../../infra/events/events.constants.js';
 import { RepositoryService } from '../services/repository.service';
 import { INormalizeCommitsJob, INormalizeTreeJob, NORMALIZE_TREE_JOB } from '../jobs/normalize-provider-data.job';
 
-@Processor(QUEUE_NAMES.FETCH_PROVIDER_DATA_QUEUE, {
+@Processor(QUEUE_NAMES.NORMALIZE_PROVIDER_DATA_QUEUE, {
     concurrency: 5,
     limiter: {
         max: 10,
@@ -39,16 +38,14 @@ export class RepositoryNormalizeProcessor extends WorkerHost {
     }
 
     private async processNormalizeTreeData(job: Job<INormalizeTreeJob>) {
-        const { repositoryId } = job.data;
-        //get cached tree data of this repo
-
-        await  Promise.resolve(); // Simulate async work
-        // await this.repositoryService.normaliezeTree({ owner, repo_name, default_branch, token, });
-        // const cacheKey = CACHE_KEYS.raw.tree(repositoryId);
+        const { repositoryId,cacheKey } = job.data;
+        const redisRawTreeList  = await this.redisService.get(CACHE_KEYS.raw.tree(repositoryId));
+     
+        await this.repositoryService.addFilesTree({ repositoryId,tree:redisRawTreeList });
         // await this.redisService.set(cacheKey, treeData);
-        // this.eventService.emit(EVENTS.TREE_FETCHED, { repositoryId });
+        // this.eventService.emit(EVENTS., { repositoryId });
 
-        return { success: true, repositoryId, dataType: 'tree', cached: true, };
+        // return { success: true, repositoryId, dataType: 'tree', cached: true, };
     }
 
 

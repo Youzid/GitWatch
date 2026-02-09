@@ -10,23 +10,8 @@ import { plainToClass } from 'class-transformer';
 import { GitHubService } from '../../git-provider/services/github-service';
 import { EVENTS } from '../../../../infra/events/events.constants';
 import { EventsService } from '../../../../infra/events/events.service';
-import { RedisService } from '../../../../infra/redis/redis.service';
-import { CACHE_KEYS } from '../../../../infra/redis/redis-keys.constants';
+// import { CACHE_KEYS } from '../../../../infra/redis/redis-keys.constants';
 
-interface GitHubTreeItem {
-  path: string;
-  mode: string;
-  type: 'blob' | 'tree';
-  sha: string;
-  size?: number;
-  url: string;
-}
-
-interface GitHubTreeResponse {
-  sha: string;
-  url: string;
-  tree: GitHubTreeItem[];
-}
 @Injectable()
 export class RepositoryService {
     constructor(
@@ -34,7 +19,7 @@ export class RepositoryService {
         private readonly encryptionService: EncryptionService,
         private readonly githubService: GitHubService,
         private readonly eventService: EventsService,
-        private readonly redisService: RedisService,
+        // private readonly redisService: RedisService,
     ) { }
 
     async create(dto: CreateRepositoryDto, userId: number) {
@@ -75,10 +60,9 @@ export class RepositoryService {
     }
 
  
-    async addFilesTree(repoid: number) {
-        const redisRawTreeList : GitHubTreeResponse = await this.redisService.get(CACHE_KEYS.raw.tree(23));
+    async addFilesTree({repositoryId,tree}: {repositoryId: number, tree:{path:string,name:string,type:"blob" | "tree" ,sha:string,size:number}[] }) {
 
-        const normalizedFiles = this.normalizeTreeData(redisRawTreeList.tree, repoid);
+        const normalizedFiles = this.normalizeTreeData({ repositoryId,tree});
 
         await this.repositoryRepository.bulkInsertFiles(normalizedFiles);
         
@@ -86,7 +70,7 @@ export class RepositoryService {
         return { success: true, filesCount: normalizedFiles.length };
     }
 
-    private normalizeTreeData(tree: GitHubTreeItem[],repoid: number,): any[] {
+    private normalizeTreeData({repositoryId,tree}: {repositoryId: number, tree:{path:string,name:string,type:"blob" | "tree",sha:string,size:number}[] }) {
         
         return tree.map((item) => {
             const pathParts = item.path.split('/');
@@ -95,14 +79,13 @@ export class RepositoryService {
             const parent_path = depth === 0 ? null : pathParts.slice(0, -1).join('/');
 
             return {
-                repository_id: repoid,
+                repository_id: repositoryId,
                 path: item.path,
                 size: item.size || null,
-                type: item.type === 'blob' ? 'BLOB' : 'TREE',
+                type: (item.type === 'blob' ? 'BLOB' : 'TREE') as DB['files']['type'] ,
                 name: name,
                 parent_path: parent_path,
                 sha: item.sha,
-                url: item.url,
                 depth: depth,
             };
         });

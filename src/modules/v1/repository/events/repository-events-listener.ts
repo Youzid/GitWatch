@@ -13,8 +13,6 @@ export class RepositoryEventsListener {
     @OnEvent(EVENTS.TREE_CACHED)
     async handleTreeCached(payload: TreeCachedPayload) {
         await this.repositoryQueueService.addNormalizeTreeJob(payload);
-       
-        console.log(`triggering provider jobs ${payload?.repositoryId}`);
     }
 
 }

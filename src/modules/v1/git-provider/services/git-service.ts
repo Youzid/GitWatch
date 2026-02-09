@@ -87,7 +87,6 @@ export class GitService {
 
         try {
             const result = await git.raw(['ls-tree', '-r', '-t', '-l', 'HEAD']);
-            console.log(result);
             const files: { path: string; type: 'blob' | 'tree'; mode: string; sha: string; size: number }[] = [];
 
             const lines = result.split('\n').filter(line => line.trim());

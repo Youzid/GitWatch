@@ -9,6 +9,8 @@ import { RedisService } from '../../../../infra/redis/redis.service';
 import { EventsService } from '../../../../infra/events/events.service';
 import { CACHE_KEYS } from '../../../../infra/redis/redis-keys.constants.js';
 import { GitService } from '../services/git-service';
+import { EVENTS } from '../../../../infra/events/events.constants';
+import { EncryptionService } from '../../../../infra/utils/encryption.service';
 
 @Processor(QUEUE_NAMES.FETCH_PROVIDER_DATA_QUEUE, {
     concurrency: 5,
@@ -22,6 +24,7 @@ export class GitHubProcessor extends WorkerHost {
     constructor(
         private readonly githubService: GitHubService,
         private readonly gitService: GitService,
+        private readonly encryptionService : EncryptionService,
         private readonly redisService: RedisService,
         private readonly eventService: EventsService
     ) {
@@ -43,18 +46,19 @@ export class GitHubProcessor extends WorkerHost {
     private async processFetchRawTreeData(job: Job<IFetchRawTreeJob>) {
         const { repositoryId, owner, repo_name, token } = job.data;
 
-        const decryptedToken = token // this.encryptionService.decrypt(token);
+        const decryptedToken = this.encryptionService.decrypt(token);
         const authenticatedUrl = `https://${decryptedToken}@github.com/${owner}/${repo_name}.git`;
-        const savedRepoGitFolderPath = await this.gitService.cloneRepository({ repositoryId, owner, repo_name, authenticatedUrl, token, });
+        console.log(`Cloning repository ${owner}/${repo_name} for repositoryId ${repositoryId}...`);
+        await this.gitService.cloneRepository({ repositoryId, owner, repo_name, authenticatedUrl, token, });
         // save in db,
         // if save failed in db remove the folder from storage and return error
-
+        
+        console.log(` Fetching tree data for repository ${repositoryId}...`);
         const treeData = await this.gitService.getTreeData({ repositoryId });
-
-        // const cacheKey = CACHE_KEYS.raw.tree(repositoryId);
-        // await this.redisService.set(cacheKey, treeData);
-        // this.eventService.emit(EVENTS.TREE_CACHED, { repositoryId , cacheKey});
-
+        const cacheKey = CACHE_KEYS.raw.tree(repositoryId);
+        await this.redisService.set(cacheKey, treeData);
+        this.eventService.emit(EVENTS.TREE_CACHED, { repositoryId , cacheKey});
+        
         return { success: true, repositoryId, dataType: 'tree', cached: true, };
     }
 
