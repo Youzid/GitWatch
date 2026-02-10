@@ -58,13 +58,14 @@ export interface Files {
   depth: Generated<number>;
   id: Generated<number>;
   name: string;
+  parent_id: number | null;
   parent_path: string | null;
   path: string;
   repository_id: number;
   sha: string;
   size: number | null;
   type: FileTypes;
-  url: string;
+  url: string | null;
 }
 
 export interface PullRequests {

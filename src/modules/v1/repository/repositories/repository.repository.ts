@@ -77,18 +77,27 @@ export class RepositoryRepository {
       .executeTakeFirst();
   }
 
+    async bulkInsertFiles(files: Insertable<DB['files']>[]) { // OPTIMISATION NOTE // can improve thisalgo with o(depth) instead of o(n)
 
-async bulkInsertFiles(files: Insertable<DB['files']>[]) {
-  if (files.length === 0) return [];
+        if (files.length === 0) return [];
 
-  return await this.db.transaction().execute(async (trx) => {
-    const insertedFiles = await trx
-      .insertInto('files')
-      .values(files)
-      .returningAll()
-      .execute();
-    return insertedFiles;
-  });
-}
+        return await this.db.transaction().execute(async (trx) => {
+            const pathToIdMap = new Map<string, number>();
 
+            for (const file of files) {
+                const { parent_path} = file;
+
+                const parent_id = parent_path ? pathToIdMap.get(parent_path) ?? null : null;
+
+                const [inserted] = await trx
+                    .insertInto('files')
+                    .values({ ...file, parent_id })
+                    .returningAll()
+                    .execute();
+
+                pathToIdMap.set(inserted.path, inserted.id);
+            }
+
+        });
+    }
 }
