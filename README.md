@@ -1,2 +1,2 @@
-## a git repo analyser tool
-built to help developers and manger get insights of git commits / branches / contributors / metrics 
+## a git analyser tool
+built to help developers and project managers get insights of git commits frequencies / contributors / metrics ..
